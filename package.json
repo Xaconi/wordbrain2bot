@@ -1,16 +1,15 @@
 {
-  "name": "telegram-example",
-  "version": "1.0.0",
-  "description": "Telegram bot in 30 lines of code",
+  "name": "wordbrain2bot",
+  "version": "0.1",
+  "description": "Wordbrain2 Telegram Bot - We're not cheaters, just lazy...",
   "main": "main.js",
   "scripts": {
     "start": "node main.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Oleksandr Tryshchenko <ensaierwa@gmail.com> (tryshchenko.com)",
-  "license": "ISC",
+  "author": "Nicolás Joel Giacconi Fernández - @Xaconi",
   "dependencies": {
-    "node-telegram-bot-api": "0.29.0",
-    "request": "2.83.0"
+    "request": "2.83.0",
+    "telebot": "^1.2.3"
   }
 }
