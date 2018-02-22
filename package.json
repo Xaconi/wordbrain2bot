@@ -1,6 +1,6 @@
 {
   "name": "wordbrain2bot",
-  "version": "0.1",
+  "version": "1.0",
   "description": "Wordbrain2 Telegram Bot - We're not cheaters, just lazy...",
   "main": "main.js",
   "scripts": {
