@@ -1,9 +1,15 @@
+const apiKey = '';
 const TeleBot = require('telebot');
-const bot = new TeleBot('459675419:AAG49yWfCK5DaCM_7PzATWl8ujWPatYg-rM');
+const bot = new TeleBot(apiKey);
 
 bot.on(
 	'text', 
 	(msg) => msg.reply.text(msg.text)
+);
+
+bot.on(
+	'photo', 
+	(msg) => msg.reply.photo('https://api.telegram.org/file/bot' + apiKey + '/' + msg.photo[0].file_path)
 );
 
 bot.start();

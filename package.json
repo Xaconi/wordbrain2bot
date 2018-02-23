@@ -10,6 +10,7 @@
   "author": "Nicolás Joel Giacconi Fernández - @Xaconi",
   "dependencies": {
     "request": "2.83.0",
+    "resemblejs": "^2.9.0",
     "telebot": "^1.2.3"
   }
 }
