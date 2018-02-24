@@ -1,4 +1,4 @@
-const apiKey = '459675419:AAG49yWfCK5DaCM_7PzATWl8ujWPatYg-rM';
+const apiKey = '';
 const TeleBot = require('telebot');
 const bot = new TeleBot(apiKey);
 
