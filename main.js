@@ -1,4 +1,4 @@
-const apiKey = '';
+const apiKey = '459675419:AAG49yWfCK5DaCM_7PzATWl8ujWPatYg-rM';
 const TeleBot = require('telebot');
 const bot = new TeleBot(apiKey);
 
@@ -9,7 +9,11 @@ bot.on(
 
 bot.on(
 	'photo', 
-	(msg) => msg.reply.photo('https://api.telegram.org/file/bot' + apiKey + '/' + msg.photo[0].file_path)
+	(msg) => {
+		// msg.reply.photo('https://api.telegram.org/file/bot' + apiKey + '/' + msg.photo[0].file_path);
+		console.log(msg.photo);
+		msg.reply.photo('http://thecatapi.com/api/images/get');
+	}
 );
 
 bot.start();
