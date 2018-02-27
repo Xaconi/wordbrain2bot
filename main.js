@@ -6,15 +6,38 @@ const fs = require('fs');
 const Jimp = require("jimp");
 const request = require('request');
 
+// Dades d'imatge del tauler
+const puntInicialTauler = {
+	'4x4': {
+		'x':29, 
+		'y':203
+	},
+	'4x3': {
+		'x':100, 
+		'y':203
+	}
+};
+
+const midesTauler = {
+	'4x4': {
+		'amplada':585, 
+		'alçada':585
+	},
+	'4x3': {
+		'amplada':440, 
+		'alçada':585
+	}
+};
+
+const lletres  = {'abc': ['a', 'á', 'b', 'c', 'd', 'e', 'é', 'f', 'g', 'h', 'i', 'í', 'j', 'k', 'l', 'm', 'n', 'o', 'ó', 'p', 'q', 'r', 's', 't', 'u', 'ú', 'v', 'w', 'y', 'z']}
+
 var message;
 var dadesTauler;
 var files;
 var columnes;
 var tauler = false;
-
-// Dades d'imatge del tauler
-var puntInicialTauler = {'x':29, 'y':203};
-var midesTauler = {'amplada':585, 'alçada':585};
+var localLletres = [];
+var finalLletres = [];
 
 bot.on(['/start', '/hello'], 
 	(msg) => {
@@ -29,9 +52,13 @@ bot.on(
 			// Es tracta de l'estructura del tauler
 			tauler = true;
 			dadesTauler = msg.text;
-			files = parseInt(msg.text.charAt('0'));
-			columnes = parseInt(msg.text.charAt('2'));
-			msg.reply.text('De acuerdo! El tablero al que estás jugando tiene una estructura de ' + msg.text + '. Ahora vuelve al juego y envíame una captura de pantalla para que pueda ayudarte!');
+			if(puntInicialTauler[dadesTauler] == undefined){
+				msg.reply.text('😖 Lo siento ' + msg.text + ' no es una medida de tablero válida, asegúrate de que estás escribiéndolo correctamente. Recuerda, tienes que entrar los datos del tablero en formato NxM (por ej. 3x4, que serian 3 filas y 4 columnas) 😖');
+			} else {
+				files = parseInt(msg.text.charAt('0'));
+				columnes = parseInt(msg.text.charAt('2'));
+				msg.reply.text('De acuerdo! El tablero al que estás jugando tiene una estructura de ' + msg.text + '. Ahora vuelve al juego y envíame una captura de pantalla para que pueda ayudarte!');
+			}
 		} else if(msg.text != '/start' && msg.text != '/hello'){
 			msg.reply.text('Lo siento, no reconozco la estructura. ¿Puedes volverlo a intentar?');
 		}
@@ -107,24 +134,38 @@ function getLetters(photo){
 	    console.log(err);
 	}); */
 
-	var ampladaLletra = parseInt(midesTauler['amplada'] / columnes);
-	var alçadaLletra = parseInt(midesTauler['alçada'] / files);
+	var ampladaLletra = parseInt(midesTauler[dadesTauler]['amplada'] / columnes);
+	var alçadaLletra = parseInt(midesTauler[dadesTauler]['alçada'] / files);
 
 	Jimp.read(photo).then(function (image) {
 		for(i = 0; i<files; i++){
 			for(j = 0; j<columnes; j++){
 				letter = image.clone();
-				console.log("Punt Inicial X = " + puntInicialTauler['x'] + (j*ampladaLletra));
-				console.log("Punt Inicial Y = " + puntInicialTauler['y'] + (i*alçadaLletra));
+				console.log("Punt Inicial X = " + puntInicialTauler[dadesTauler]['x'] + (j*ampladaLletra));
+				console.log("Punt Inicial Y = " + puntInicialTauler[dadesTauler]['y'] + (i*alçadaLletra));
 				console.log("Amplada Lletra = " + ampladaLletra);
 				console.log("Alçada Lletra = " + alçadaLletra);
 				letter.crop(
-					puntInicialTauler['x'] + (j*ampladaLletra),
-					puntInicialTauler['y'] + (i*alçadaLletra),
+					puntInicialTauler[dadesTauler]['x'] + (j*ampladaLletra),
+					puntInicialTauler[dadesTauler]['y'] + (i*alçadaLletra),
 					ampladaLletra,
 					alçadaLletra);
-				letter.write(i + ' ' + j + '.png');
+				localLletres.push(letter);
+				// letter.write(i + ' ' + j + '.png');
 			}
 		}
+
+		localLletres.forEach(function(lletra){
+			for(i = 0; i<lletres['abc'].length; i++){
+
+				Jimp.read('letters/' + lletres['abc'][i] + '.png').then(function (image) {
+						var threshold = 0.1;
+				    	var diff = Jimp.diff(lletra, image, threshold);
+						if(diff.percent < 0.05){
+							break;
+						}
+				});
+			}
+		});
 	});
 }
