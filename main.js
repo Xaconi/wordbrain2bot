@@ -29,7 +29,7 @@ const midesTauler = {
 	}
 };
 
-const lletres  = {'abc': ['a', 'á', 'b', 'c', 'd', 'e', 'é', 'f', 'g', 'h', 'i', 'í', 'j', 'k', 'l', 'm', 'n', 'o', 'ó', 'p', 'q', 'r', 's', 't', 'u', 'ú', 'v', 'w', 'y', 'z']}
+const lletres  = {'abc': ['a', 'á', 'b', 'c', 'd', 'e', 'é', 'f', 'g', 'h', 'i', 'í', 'j', 'k', 'l', 'm', 'n', 'o', 'ó', 'p', 'q', 'r', 's', 't', 'u', 'ú', 'v', 'w', 'y', 'z']};
 
 var message;
 var dadesTauler;
@@ -37,11 +37,14 @@ var files;
 var columnes;
 var tauler = false;
 var localLletres = [];
+var userLletres = [];
 var finalLletres = [];
+var letterFound;
 
 bot.on(['/start', '/hello'], 
 	(msg) => {
 		msg.reply.text('Bienvenido al bot de Wordbrain 2! Para poder ayudarte, primero envíame los datos del tablero al que estás jugando (por ej. 4x5 o 6x6).');
+		llegirLletresLocals();
 	}
 );
 
@@ -124,7 +127,7 @@ function getLetters(photo){
 	/*Jimp.read(photo).then(function (image) {
 	    level = image.crop(276, 59, 173, 25);
 
-	    Jimp.read('levels/level5_es.png').then(function (image2) {
+	    Jimp.read('levels/level5_es.jpg').then(function (image2) {
 	    	var threshold = 0.1;
 	    	var diff = Jimp.diff(level, image2, threshold);
 			console.log(diff);
@@ -150,22 +153,43 @@ function getLetters(photo){
 					puntInicialTauler[dadesTauler]['y'] + (i*alçadaLletra),
 					ampladaLletra,
 					alçadaLletra);
-				localLletres.push(letter);
-				// letter.write(i + ' ' + j + '.png');
+				userLletres.push(letter);
 			}
 		}
 
-		localLletres.forEach(function(lletra){
-			for(i = 0; i<lletres['abc'].length; i++){
+		userLletres.forEach(function(lletraUser, indexUser){
+			// lletraUser.write('lletraUser' + indexUser + '.jpg');
+			// if(indexUser == 14) {
+				// lletraUser.write('lletraUser' + indexUser + '.jpg');
+				var minDistance = 1;
+				var lletraLocalMin;
+				localLletres.forEach(function(lletraLocal, indexLocal){
+					// lletraLocal[0].write('lletraLocal' + indexLocal + '.jpg');
+					var threshold = 0.001;
+			    	var distance = Jimp.distance(lletraUser, lletraLocal[0]);
 
-				Jimp.read('letters/' + lletres['abc'][i] + '.png').then(function (image) {
-						var threshold = 0.1;
-				    	var diff = Jimp.diff(lletra, image, threshold);
-						if(diff.percent < 0.05){
-							break;
-						}
+					if(distance < minDistance){
+						minDistance = distance;
+						lletraLocalMin = lletraLocal;
+						// console.log("Lletra " + lletraLocal[1]);
+						// console.log(distance);
+					}
 				});
-			}
+				finalLletres.push(lletraLocalMin);
+				console.log("Lletra trobada, la " + lletraLocalMin[1]);
+				console.log(minDistance);
+			// }
 		});
 	});
+}
+
+function llegirLletresLocals(){
+	for(i = 0; i<lletres['abc'].length; i++){
+		let name = lletres['abc'][i];
+		let j = i;
+		Jimp.read('letters/' + lletres['abc'][i] + '.jpg').then(function(image){
+				// image.write(j + '.jpg');
+				localLletres.push([image, name]);
+		});
+	}
 }
