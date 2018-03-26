@@ -13,8 +13,8 @@ const puntInicialTauler = {
 		'y':203
 	},
 	'4x3': {
-		'x':100, 
-		'y':203
+		'x':106, 
+		'y':207
 	}
 };
 
@@ -24,12 +24,14 @@ const midesTauler = {
 		'alçada':585
 	},
 	'4x3': {
-		'amplada':440, 
-		'alçada':585
+		'amplada':430, 
+		'alçada':576
 	}
 };
 
 const lletres  = {'abc': ['a', 'á', 'b', 'c', 'd', 'e', 'é', 'f', 'g', 'h', 'i', 'í', 'j', 'k', 'l', 'm', 'n', 'o', 'ó', 'p', 'q', 'r', 's', 't', 'u', 'ú', 'v', 'w', 'y', 'z']};
+
+const marge = parseInt(20);
 
 var message;
 var dadesTauler;
@@ -74,7 +76,8 @@ bot.on(
 		if(tauler){
 			msg.reply.text('👌 Perfecto! Déjame un momento que me lo mire y enseguida te respondo todas las soluciones posibles.');
 			// Aconseguim la foto en bona qualitat
-			getRealPhoto(msg.photo[3], function(photo) {
+			var index = msg.photo.length - 1;
+			getRealPhoto(msg.photo[index], function(photo) {
 				photoEdition(photo, function() {
 					// msg.reply.photo('test.jpg');
 					getLetters('test.jpg');
@@ -137,34 +140,35 @@ function getLetters(photo){
 	    console.log(err);
 	}); */
 
-	var ampladaLletra = parseInt(midesTauler[dadesTauler]['amplada'] / columnes);
-	var alçadaLletra = parseInt(midesTauler[dadesTauler]['alçada'] / files);
+	var ampladaLletra = parseInt((midesTauler[dadesTauler]['amplada'] / columnes));
+	var alçadaLletra = parseInt((midesTauler[dadesTauler]['alçada'] / files));
 
 	Jimp.read(photo).then(function (image) {
 		for(i = 0; i<files; i++){
 			for(j = 0; j<columnes; j++){
 				letter = image.clone();
-				console.log("Punt Inicial X = " + puntInicialTauler[dadesTauler]['x'] + (j*ampladaLletra));
-				console.log("Punt Inicial Y = " + puntInicialTauler[dadesTauler]['y'] + (i*alçadaLletra));
-				console.log("Amplada Lletra = " + ampladaLletra);
-				console.log("Alçada Lletra = " + alçadaLletra);
+				console.log("Punt Inicial X = " + puntInicialTauler[dadesTauler]['x'] + (j*ampladaLletra) + marge);
+				console.log("Punt Inicial Y = " + puntInicialTauler[dadesTauler]['y'] + (i*alçadaLletra) + marge);
+				console.log("Amplada Lletra = " + parseInt(ampladaLletra - marge*2));
+				console.log("Alçada Lletra = " + parseInt(alçadaLletra - marge*2));
 				letter.crop(
-					puntInicialTauler[dadesTauler]['x'] + (j*ampladaLletra),
-					puntInicialTauler[dadesTauler]['y'] + (i*alçadaLletra),
-					ampladaLletra,
-					alçadaLletra);
+					puntInicialTauler[dadesTauler]['x'] + (j*ampladaLletra) + marge,
+					puntInicialTauler[dadesTauler]['y'] + (i*alçadaLletra) + marge,
+					ampladaLletra - marge*2,
+					alçadaLletra - marge*2);
 				userLletres.push(letter);
 			}
 		}
 
 		userLletres.forEach(function(lletraUser, indexUser){
 			// lletraUser.write('lletraUser' + indexUser + '.jpg');
-			// if(indexUser == 14) {
-				// lletraUser.write('lletraUser' + indexUser + '.jpg');
+			// if(indexUser == 0) {
+				lletraUser.write('lletraUser' + indexUser + '.jpg');
 				var minDistance = 1;
 				var lletraLocalMin;
 				localLletres.forEach(function(lletraLocal, indexLocal){
-					// lletraLocal[0].write('lletraLocal' + indexLocal + '.jpg');
+					// lletraAux = lletraLocal[0].crop(marge, marge, ampladaLletra - marge*2, alçadaLletra - marge*2);
+					// lletraAux.write(indexLocal + ".jpg")
 					var threshold = 0.001;
 			    	var distance = Jimp.distance(lletraUser, lletraLocal[0]);
 
@@ -187,7 +191,7 @@ function llegirLletresLocals(){
 	for(i = 0; i<lletres['abc'].length; i++){
 		let name = lletres['abc'][i];
 		let j = i;
-		Jimp.read('letters/' + lletres['abc'][i] + '.jpg').then(function(image){
+		Jimp.read('letters_cropped/' + lletres['abc'][i] + '.jpg').then(function(image){
 				// image.write(j + '.jpg');
 				localLletres.push([image, name]);
 		});
